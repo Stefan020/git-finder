@@ -1,27 +1,28 @@
-import React, {Fragment, Component } from 'react'
+import React, {Fragment, useContext, useEffect } from 'react'
 import Spinner from '../layout/Spinner';
-import PropTypes from 'prop-types'
+import Repos from '../repos/Repos';
 import {Link} from 'react-router-dom';
+import GithubContext from '../../context/github/githubContext';
 
+const User = ({ match }) => {
+    const githubContext = useContext(GithubContext)
+    
+    const { user, loading, getUser, repos, getUserRepos } = githubContext;
 
-export class User extends Component {
-    componentDidMount() {
-        this.props.getUser(this.props.match.params.login)
-    }
+    useEffect(() => {
+        getUser(match.params.login)
+        getUserRepos(match.params.login)
+        //eslint-disable-next-line
+    },[])
 
-    static propTypes = {
-        loading: PropTypes.bool,
-        user:PropTypes.object.isRequired,
-        getUser: PropTypes.func.isRequired
-    }
-    render() {
-        const { name, avatar_url, location, bio, blog, login, html_url, company, followers, following, public_repos, public_gists, hireable} = this.props.user;
+        
 
-        const { loading } = this.props;
+        const { name, avatar_url, location, bio, blog, login, html_url, company, followers, following, public_repos, public_gists, hireable} = user;
 
         if(loading) return <Spinner />
 
-        return <Fragment>
+        return (
+        <Fragment>
             <Link to='/' className='btn btn-light'>
                 Back To Search
             </Link>
@@ -68,8 +69,10 @@ export class User extends Component {
                 <div className="badge badge-light">Public Repos: {public_repos}</div>
                 <div className="badge badge-dark">Public Gists: {public_gists}</div>
             </div>
+
+            <Repos repos={repos} />
         </Fragment>
-    }
+        )
 }
 
 export default User
